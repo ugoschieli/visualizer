@@ -7,6 +7,7 @@ export type VectorFunction = (
 ) => [number, number];
 
 // General version of the function parser
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function parseFunction(str: string): Function {
   const fn_body_idx = str.indexOf("{");
   const fn_body = str.substring(fn_body_idx + 1, str.lastIndexOf("}"));
