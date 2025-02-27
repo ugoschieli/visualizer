@@ -13,6 +13,7 @@ RUN sed -i 's#src/lib.rs#dummy.rs#' Cargo.toml
 RUN touch dummy.rs
 RUN cargo build --target=wasm32-unknown-unknown --release
 RUN sed -i 's#dummy.rs#src/lib.rs#' Cargo.toml
+RUN rm dummy.rs
 
 COPY ./build.sh ./
 

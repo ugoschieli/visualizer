@@ -1,10 +1,10 @@
 .PHONY: build run clean
 
 run: clean build
-	docker run --rm -v ./artifact:/builder/artifact rust-builder
+	docker run --rm -v ./artifact:/builder/artifact visualizer-rust
 
 build:
-	docker build -t rust-builder .
+	docker build -t visualizer-rust .
 
 clean:
 	rm -rf ./artifact
