@@ -1,21 +1,42 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-full">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vizualizer</title>
+    <link rel="stylesheet" href="./src/style.css" />
+    <title>visualizer</title>
   </head>
-  <body>
-    <canvas
-      id="canvas"
-      height="400"
-      width="400"
-      style="background-color: #060606"
-    ></canvas>
-    <button id="reload-btn">Reload Fn</button>
-    <button id="wasm-btn">Test Wasm</button>
-    <pre id="editor"></pre>
+  <body class="flex h-full flex-col bg-gray-900">
+    <div class="justify-items-center">
+      <h1 class="text-2xl font-bold text-blue-400">Visualizer</h1>
+    </div>
+    <main class="flex flex-1 justify-between gap-8 p-8">
+      <canvas
+        id="canvas"
+        class="h-[400px] w-[400px]"
+        height="400"
+        width="400"
+        style="background-color: #060606"
+      ></canvas>
+      <div class="flex flex-1 flex-col">
+        <div>
+          <button
+            id="reload-btn"
+            class="mr-2 mb-2 rounded-sm bg-blue-400 p-1 hover:cursor-pointer"
+          >
+            Reload
+          </button>
+          <button
+            id="wasm-btn"
+            class="mb-2 rounded-sm bg-blue-400 p-1 hover:cursor-pointer"
+          >
+            Test Wasm
+          </button>
+        </div>
+        <div id="editor" class="h-full"></div>
+      </div>
+    </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

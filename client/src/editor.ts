@@ -1,9 +1,14 @@
-import { RyuseiCode, javascript, Extensions } from "@ryusei/code";
-import "@ryusei/code/dist/css/themes/ryuseicode-ryusei.min.css";
-
+import * as monaco from "monaco-editor";
+import { shikiToMonaco } from "@shikijs/monaco";
+import { createHighlighter } from "shiki";
 import state from "./state";
 import { initCanvas } from "./canvas";
 import { parseVectorFunction } from "./vectorFunction";
+
+const highlighter = await createHighlighter({
+  themes: ["rose-pine"],
+  langs: ["javascript"],
+});
 
 const initialFnStr = `const a = (x, y, t) => {
   const k = x / 8 - 25;
@@ -22,7 +27,7 @@ const initialFnStr = `const a = (x, y, t) => {
 let fnStr = initialFnStr;
 
 export const initEditor = () => {
-  const pre = document.getElementById("editor") as HTMLPreElement;
+  const editor = document.getElementById("editor") as HTMLPreElement;
   const button = document.getElementById("reload-btn") as HTMLButtonElement;
 
   button.addEventListener("click", () => {
@@ -31,18 +36,28 @@ export const initEditor = () => {
     initCanvas();
   });
 
-  pre.innerHTML = initialFnStr;
-
-  RyuseiCode.register([javascript()]);
-  RyuseiCode.compose(Extensions);
-
-  const ryuseiCode = new RyuseiCode({
+  monaco.languages.register({ id: "javascript" });
+  shikiToMonaco(highlighter, monaco);
+  const m = monaco.editor.create(editor, {
+    value: fnStr,
+    theme: "rose-pine",
     language: "javascript",
+    minimap: {
+      enabled: false,
+    },
+    automaticLayout: false,
   });
 
-  ryuseiCode.on("changed", () => {
-    fnStr = ryuseiCode.toString();
+  window.addEventListener("resize", () => {
+    m.layout({ width: 0, height: 0 });
+
+    window.requestAnimationFrame(() => {
+      const rect = editor.getBoundingClientRect();
+      m.layout({ width: rect.width, height: rect.height });
+    });
   });
 
-  ryuseiCode.apply(pre);
+  m.onDidChangeModelContent(() => {
+    fnStr = m.getModel()!.getValue()!;
+  });
 };
