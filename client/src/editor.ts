@@ -1,5 +1,6 @@
 import * as monaco from "monaco-editor";
 import { shikiToMonaco } from "@shikijs/monaco";
+import { languages } from "./config.json";
 import { createHighlighter } from "shiki";
 import state from "./state";
 import { initCanvas } from "./canvas";
@@ -7,33 +8,41 @@ import { parseVectorFunction } from "./vectorFunction";
 
 const highlighter = await createHighlighter({
   themes: ["rose-pine"],
-  langs: ["javascript"],
+  langs: ["javascript", "rust"],
 });
 
-const initialFnStr = `const a = (x, y, t) => {
-  const k = x / 8 - 25;
-  const e = y / 8 - 25;
-  const d = (k ** 2 + e ** 2) / 99;
-
-  const q = x / 3 + ((k * 0.5) / Math.cos(y * 5)) * Math.sin(d ** 2 - t);
-  const c = d / 2 - t / 8;
-
-  const px = q * Math.sin(c) + e * Math.sin(d + k - t) + 200;
-  const py = (q + y / 8 + d * 9) * Math.cos(c) + 200;
-
-  return [px, py];
-};`;
-
-let fnStr = initialFnStr;
+const readCode = (language: string) => {
+  return atob(languages.filter((l) => l.id === language)[0].initialCode);
+};
 
 export const initEditor = () => {
+  let fnStr = readCode("javascript");
+
   const editor = document.getElementById("editor") as HTMLPreElement;
   const button = document.getElementById("reload-btn") as HTMLButtonElement;
+  const languagesSelect = document.getElementById(
+    "languages",
+  ) as HTMLSelectElement;
+
+  languages.forEach((l) => {
+    const option = document.createElement("option");
+    option.value = l.id;
+    option.innerText = l.label;
+    languagesSelect.appendChild(option);
+  });
 
   button.addEventListener("click", () => {
     state.fn = parseVectorFunction(fnStr);
     cancelAnimationFrame(state.animationId);
     initCanvas();
+  });
+
+  languagesSelect.addEventListener("change", () => {
+    const language = languagesSelect.value;
+    state.language = language;
+    fnStr = readCode(language);
+    m.getModel()?.dispose();
+    m.setModel(monaco.editor.createModel(fnStr, language));
   });
 
   monaco.languages.register({ id: "javascript" });
@@ -47,6 +56,7 @@ export const initEditor = () => {
     },
     automaticLayout: false,
   });
+  state.editor = m;
 
   window.addEventListener("resize", () => {
     m.layout({ width: 0, height: 0 });
